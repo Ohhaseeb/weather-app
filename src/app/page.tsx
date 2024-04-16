@@ -1,3 +1,8 @@
+"use client";
+import { useState } from 'react';
+import useSWR from 'swr';
+import moment from 'moment';
+
 import {
   Card,
   CardContent,
@@ -9,24 +14,44 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+const fetcher = async (url: string): Promise<any> => {
+  const response: Response = await fetch(url);
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to fetch');
+  }
+
+  return data;
+};
 
 
 export default function Home() {
+  const [city, setCity] = useState('San Jose'); // Default city
+  const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;// Replace with your OpenWeatherMap API key
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`; 
+
+  const { data, error } = useSWR(apiUrl, fetcher);
+
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data) return <div>Loading...</div>;
+  console.log(data)
+
   return (
     <main>
       <div>
         <Card className="flex flex-col justify-between bg-gradient-to-b from-blue-600 to-blue-300">
           <CardHeader>
             <div className="flex flex-col items-center">
-              <CardTitle> San Jose </CardTitle>
-              <CardDescription className="text-black"> April 5th, 2024 </CardDescription>
+              <CardTitle className="text-white text-4xl"> {city} </CardTitle>
+              <CardDescription className="text-white"> {moment().format('LL')} </CardDescription>   
               <img src="/images/sun.png" alt="Sun" className="w-48 h-48" />
             </div>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center">
-              <p className="text-xl"> 11°C </p>
-              <CardDescription className="text-black text-lg"> Clear </CardDescription>
+              <p className="text-2xl"> {Math.round(data.main.temp)}° </p>
+              <CardDescription className="text-black text-lg text-white"> {data.weather[0].description} </CardDescription>
             </div>
           </CardContent>
           <div className="flex flex-col items-center">

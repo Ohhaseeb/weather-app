@@ -79,7 +79,7 @@
     @apply max-w-6xl mx-auto my-12;
   }
   p {
-    @apply mt-2;
+    @apply mt-2 text-white;
   }
   h1 {
     @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
