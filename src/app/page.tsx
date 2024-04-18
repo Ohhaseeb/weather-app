@@ -42,29 +42,41 @@ export default function Home() {
   if (!forecastdata) return <div>Loading...</div>;
   console.log(data)
   console.log(forecastdata)
-  
+
   function tempForecast (params : number) {
+    var multi = params
+    var midday = data.sys.sunset - ((data.sys.sunset - data.sys.sunrise) / 4)
+    if (data.dt < midday) {
+      multi += 1;
+    }
+    
     var max = 0;
+    var min = 999
       for (var i = 0; i < 8; i++) {
-        var g = i + (params * 8)
+        var g = i + (multi * 8)
         if (forecastdata.list[g].main.temp > max) {
           max = forecastdata.list[g].main.temp
         }
+        if (forecastdata.list[g].main.temp < min) {
+          min = forecastdata.list[g].main.temp
+        }
       }
-    return Math.round(max)
+    return `${Math.round(max)}°  |  ${Math.round(min)}°`
   }
 
   function weatherForecast (params : number) {
-    var code = forecastdata.list[params].weather[0].icon
-    var imgurl = `http://openweathermap.org/img/w/${code}.png`
-    return imgurl
+    return forecastdata.list[params].weather[0].main
   }
 
-  function dayName (date : string) {
-    var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    var d = new Date(date);
-    return days[d.getDay()];
+  function dayName (date : number) {
+    let dateTime = new Date(date * 1000 + (data.timezone * 1000));
+
+    // Convert into 24-hour format
+    let weekday = dateTime.toLocaleString('default', { weekday: 'long' });
+    
+    return `${weekday}`
   }
+    
 
   return (
     <main>
@@ -87,29 +99,24 @@ export default function Home() {
             <CardFooter>
               <div className="grid grid-rows-5 gap-4">
                 <div className="grid grid-cols-3 gap-80">
-                    <p>{dayName(forecastdata.list[0].dt_txt)}</p>
-                    <img src={weatherForecast(6)}/>
-                    <p>{tempForecast(0)}°</p>
+                  <p>{dayName(forecastdata.list[8].dt)}</p>
+                  <p>{weatherForecast(8)}</p>
+                  <p>{tempForecast(0)}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[8].dt_txt)}</p>
-                  <img src={weatherForecast(14)}/>
-                  <p>{tempForecast(1)}°</p>
+                  <p>{dayName(forecastdata.list[16].dt)}</p>
+                  <p>{weatherForecast(16)}</p>
+                  <p>{tempForecast(1)}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[16].dt_txt)}</p>
-                  <img src={weatherForecast(22)}/>
-                  <p>{tempForecast(2)}°</p>
+                  <p>{dayName(forecastdata.list[24].dt)}</p>
+                  <p>{weatherForecast(24)}</p>
+                  <p>{tempForecast(2)}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[24].dt_txt)}</p>
-                  <img src={weatherForecast(30)}/>
-                  <p>{tempForecast(3)}°</p>
-                </div>
-                <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[32].dt_txt)}</p>
-                  <img src={weatherForecast(38)}/>
-                  <p>{tempForecast(4)}°</p>
+                  <p>{dayName(forecastdata.list[32].dt)}</p>
+                  <p>{weatherForecast(32)}</p>
+                  <p>{tempForecast(3)}</p>
                 </div>
               </div>
             </CardFooter>
