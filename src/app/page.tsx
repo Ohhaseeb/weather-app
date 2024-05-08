@@ -1,7 +1,8 @@
 "use client";
-import { useState } from 'react';
+import { SetStateAction, useState } from 'react';
 import useSWR from 'swr';
 import moment from 'moment';
+import Search from '@/components/ui/search'
 
 import {
   Card,
@@ -29,23 +30,43 @@ const fetcher = async (url: string): Promise<any> => {
 
 export default function Home() {
   const [city, setCity] = useState('San Jose'); // Default city
+  const [weather, setWeather] = useState({})
+  const [forecast, setForecast] = useState({})
   const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;// Replace with your OpenWeatherMap API key
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`; 
   const futureApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`
 
-  const { data, error } = useSWR(apiUrl, fetcher);
-  const future = useSWR(futureApiUrl, fetcher);
-  const forecastdata = future.data
+  /*
+   const fetchweather = (e) => {
+    e.preventDefault
+    setLoading(true);
+     
+    setWeather(data)
+    setForecast(forecastdata)
+    setCity('');
+    setLoading(false);
 
-  if (error) return <div>Error: {error.message}</div>;
-  if (!data) return <div>Loading...</div>;
-  if (!forecastdata) return <div>Loading...</div>;
-  console.log(data)
-  console.log(forecastdata)
+    
+  }
+  */
+
+    const { data, error } = useSWR(apiUrl, fetcher);
+    const future = useSWR(futureApiUrl, fetcher);
+    const forecastdata = future.data
+
+    const handleSearch = (query: SetStateAction<string>) => {
+      setCity(query)
+    }
+
+    if (!data) return <div> <Search onSearch={handleSearch}/> City not Found</div>;
+    if (!forecastdata) return <div> <Search onSearch={handleSearch}/> City not Found</div>;
+    console.log(forecastdata)
+    console.log(data)
+
 
   function tempForecast (params : number) {
     var multi = params
-    var midday = data.sys.sunset - ((data.sys.sunset - data.sys.sunrise) / 4)
+    var midday = data.sys.sunset - ((data.sys.sunset - data.sys.sunrise) / 2.5)
     if (data.dt < midday) {
       multi += 1;
     }
@@ -76,15 +97,27 @@ export default function Home() {
     
     return `${weekday}`
   }
-    
 
+  function titleCase(str: string) {
+    var splitStr = str.toLowerCase().split(' ');
+    for (var i = 0; i < splitStr.length; i++) {
+        splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+    }
+    return splitStr.join(' '); 
+ }
+  
+
+  
   return (
     <main>
+      <div>
+        <Search onSearch={handleSearch} />
+      </div>
       <div>
         <Card className="flex flex-col justify-between bg-gradient-to-b from-blue-600 to-blue-300">
           <CardHeader>
             <div className="flex flex-col items-center">
-              <CardTitle className="text-white text-4xl"> {city} </CardTitle>
+              <CardTitle className="text-white text-4xl"> {titleCase(data.name)} </CardTitle>
               <CardDescription className="text-white"> {moment().format('LL')} </CardDescription>   
               <img src="/images/sun.png" alt="Sun" className="w-48 h-48" />
             </div>
@@ -92,7 +125,7 @@ export default function Home() {
           <CardContent>
             <div className="flex flex-col items-center">
               <p className="text-2xl"> {Math.round(data.main.temp)}° </p>
-              <CardDescription className="text-black text-lg text-white"> {data.weather[0].description} </CardDescription>
+              <CardDescription className="text-white text-lg"> {data.weather[0].description} </CardDescription>
             </div>
           </CardContent>
           <div className="flex flex-col items-center">
@@ -124,5 +157,8 @@ export default function Home() {
         </Card>
       </div>
     </main>
+    
+
+   
   );
 }
