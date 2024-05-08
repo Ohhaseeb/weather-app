@@ -28,27 +28,12 @@ const fetcher = async (url: string): Promise<any> => {
 
 
 
+
 export default function Home() {
   const [city, setCity] = useState('San Jose'); // Default city
-  const [weather, setWeather] = useState({})
-  const [forecast, setForecast] = useState({})
   const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;// Replace with your OpenWeatherMap API key
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`; 
   const futureApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`
-
-  /*
-   const fetchweather = (e) => {
-    e.preventDefault
-    setLoading(true);
-     
-    setWeather(data)
-    setForecast(forecastdata)
-    setCity('');
-    setLoading(false);
-
-    
-  }
-  */
 
     const { data, error } = useSWR(apiUrl, fetcher);
     const future = useSWR(futureApiUrl, fetcher);
@@ -105,7 +90,15 @@ export default function Home() {
     }
     return splitStr.join(' '); 
  }
-  
+
+ const format = {
+  bgcolor: "from-blue-600 to-blue-300",
+  img: "/images/sun.png"
+ }
+ if (forecastdata.list[0].sys.pod == 'n') {
+    format.bgcolor = "from-black to-slate-600"
+    format.img = "/images/moon.png"
+ }
 
   
   return (
@@ -114,12 +107,12 @@ export default function Home() {
         <Search onSearch={handleSearch} />
       </div>
       <div>
-        <Card className="flex flex-col justify-between bg-gradient-to-b from-blue-600 to-blue-300">
+        <Card className={`flex flex-col justify-between bg-gradient-to-b ${format.bgcolor}`}>
           <CardHeader>
             <div className="flex flex-col items-center">
               <CardTitle className="text-white text-4xl"> {titleCase(data.name)} </CardTitle>
               <CardDescription className="text-white"> {moment().format('LL')} </CardDescription>   
-              <img src="/images/sun.png" alt="Sun" className="w-48 h-48" />
+              <img src={format.img} alt="Sun" className="w-48 h-48" />
             </div>
           </CardHeader>
           <CardContent>

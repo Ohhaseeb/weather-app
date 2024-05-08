@@ -1,5 +1,5 @@
 import { SetStateAction, useState } from 'react';
-import styles from '@/components/ui/Search.module.css'
+import styles from '@/css/Search.module.css'
 
 const Search = ({ onSearch }) => {
   const [query, setQuery] = useState('');
