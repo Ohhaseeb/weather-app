@@ -3,6 +3,7 @@ import { SetStateAction, useState } from 'react';
 import useSWR from 'swr';
 import moment from 'moment';
 import Search from '@/components/ui/search'
+import TemperatureToggle from '@/components/ui/tempswitch';
 
 import {
   Card,
@@ -30,10 +31,17 @@ const fetcher = async (url: string): Promise<any> => {
 
 
 export default function Home() {
+  const [unit, setUnit] = useState('imperial')
   const [city, setCity] = useState('San Jose'); // Default city
+  const [temperatureFormat, setTemperatureFormat] = useState('imperial')
+
+  const handleToggle = (format: string) => {
+    setTemperatureFormat(format);
+  };
+
   const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;// Replace with your OpenWeatherMap API key
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`; 
-  const futureApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${temperatureFormat}`; 
+  const futureApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${temperatureFormat}`;
 
     const { data, error } = useSWR(apiUrl, fetcher);
     const future = useSWR(futureApiUrl, fetcher);
@@ -108,6 +116,10 @@ export default function Home() {
       </div>
       <div>
         <Card className={`flex flex-col justify-between bg-gradient-to-b ${format.bgcolor}`}>
+          <div>
+            <TemperatureToggle temperatureFormat={temperatureFormat} onToggle={handleToggle} />
+          </div>
+          
           <CardHeader>
             <div className="flex flex-col items-center">
               <CardTitle className="text-white text-4xl"> {titleCase(data.name)} </CardTitle>

@@ -1,7 +1,11 @@
 import { SetStateAction, useState } from 'react';
 import styles from '@/css/Search.module.css'
 
-const Search = ({ onSearch }) => {
+interface SearchProps {
+    onSearch?: any
+  }
+
+const Search: React.FC<SearchProps> = ({ onSearch }) => {
   const [query, setQuery] = useState('');
 
   const handleChange = (e: { target: { value: SetStateAction<string>; }; }) => {
