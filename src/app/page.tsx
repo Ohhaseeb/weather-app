@@ -1,9 +1,9 @@
 "use client";
-import { SetStateAction, useState } from 'react';
-import useSWR from 'swr';
-import moment from 'moment';
-import Search from '@/components/ui/search'
+import { SetStateAction, useEffect, useState } from 'react';
+import Search from '@/components/ui/search';
 import TemperatureToggle from '@/components/ui/tempswitch';
+import Link from 'next/link';
+import '@/lib/utils'
 
 import {
   Card,
@@ -15,40 +15,36 @@ import {
 } from "@/components/ui/card"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
-const fetcher = async (url: string): Promise<any> => {
-  const response: Response = await fetch(url);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || 'Failed to fetch');
-  }
-
-  return data;
-};
-
-
-
+import { getData, getFuture, getTime, titleCase } from '@/lib/pgutil';
+import { useSearchParams } from 'next/navigation';
 
 export default function Home() {
-  const [unit, setUnit] = useState('imperial')
+  
+  const received = useSearchParams()
   const [city, setCity] = useState('San Jose'); // Default city
   const [temperatureFormat, setTemperatureFormat] = useState('imperial')
+  const tempC = received.get('city')
+  const form = received.get('format')
 
   const handleToggle = (format: string) => {
     setTemperatureFormat(format);
   };
 
-  const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;// Replace with your OpenWeatherMap API key
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=${temperatureFormat}`; 
-  const futureApiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=${temperatureFormat}`;
+if (tempC != null && form != null) {
+    useEffect(() => {
+      if (typeof window !== "undefined") {
+          setCity(tempC)
+          setTemperatureFormat(form)
+      } else console.log('window.location is UNDEFINED')
+  }, [window]);
+}
 
-    const { data, error } = useSWR(apiUrl, fetcher);
-    const future = useSWR(futureApiUrl, fetcher);
-    const forecastdata = future.data
+    const data = getData(city, temperatureFormat)
+    const forecastdata = getFuture(city, temperatureFormat)
 
     const handleSearch = (query: SetStateAction<string>) => {
-      setCity(query)
+      if (!query) return <div> <Search onSearch={handleSearch}/> City not Found</div>;
+      else setCity(query)
     }
 
     if (!data) return <div> <Search onSearch={handleSearch}/> City not Found</div>;
@@ -91,14 +87,6 @@ export default function Home() {
     return `${weekday}`
   }
 
-  function titleCase(str: string) {
-    var splitStr = str.toLowerCase().split(' ');
-    for (var i = 0; i < splitStr.length; i++) {
-        splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
-    }
-    return splitStr.join(' '); 
- }
-
  const format = {
   bgcolor: "from-blue-600 to-blue-300",
   img: "/images/sun.png"
@@ -108,7 +96,13 @@ export default function Home() {
     format.img = "/images/moon.png"
  }
 
+ const dataToSend = {
+  city: city,
+  format: temperatureFormat
+};
+
   
+
   return (
     <main>
       <div>
@@ -123,7 +117,14 @@ export default function Home() {
           <CardHeader>
             <div className="flex flex-col items-center">
               <CardTitle className="text-white text-4xl"> {titleCase(data.name)} </CardTitle>
-              <CardDescription className="text-white"> {moment().format('LL')} </CardDescription>   
+              <div className="text-white text-center translate-y-1">
+                {/* Use Next.js Link component to navigate to the next page */}
+                <Link href={{pathname:'/info', query: dataToSend}} className='className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+                  Get Today's Info
+                </Link>
+              </div>
+              <CardDescription className="text-white"> {new Date(getTime(data.timezone)).toLocaleDateString("en-US", {weekday: 'long',year: 'numeric', month: 'long', day: 'numeric'})} </CardDescription>  
+              <p>{new Date(getTime(data.timezone)).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</p> 
               <img src={format.img} alt="Sun" className="w-48 h-48" />
             </div>
           </CardHeader>
@@ -134,25 +135,28 @@ export default function Home() {
             </div>
           </CardContent>
           <div className="flex flex-col items-center">
+            <div className="text-2xl -translate-y-2">
+              <p>4-Day Forecast</p>
+            </div>
             <CardFooter>
-              <div className="grid grid-rows-5 gap-4">
-                <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[8].dt)}</p>
+              <div className="grid grid-rows-5 gap-4 text-xl">
+                <div className="grid grid-cols-3 gap-60">
+                  <p>{dayName(forecastdata.list[9].dt)}</p>
                   <p>{weatherForecast(8)}</p>
                   <p>{tempForecast(0)}</p>
                 </div>
-                <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[16].dt)}</p>
+                <div className="grid grid-cols-3 gap-60">
+                  <p>{dayName(forecastdata.list[17].dt)}</p>
                   <p>{weatherForecast(16)}</p>
                   <p>{tempForecast(1)}</p>
                 </div>
-                <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[24].dt)}</p>
+                <div className="grid grid-cols-3 gap-60">
+                  <p>{dayName(forecastdata.list[25].dt)}</p>
                   <p>{weatherForecast(24)}</p>
                   <p>{tempForecast(2)}</p>
                 </div>
-                <div className="grid grid-cols-3 gap-80">
-                  <p>{dayName(forecastdata.list[32].dt)}</p>
+                <div className="grid grid-cols-3 gap-60">
+                  <p>{dayName(forecastdata.list[33].dt)}</p>
                   <p>{weatherForecast(32)}</p>
                   <p>{tempForecast(3)}</p>
                 </div>

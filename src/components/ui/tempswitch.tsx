@@ -10,7 +10,7 @@ const TemperatureToggle: React.FC<TemperatureToggleProps> = ({ temperatureFormat
   return (
     <div className={styles.container}>
       <label className={styles.label +  " text-white"}>
-        Celsius
+        Metric
         <input
             className={styles.radioInput}
           type="radio"
@@ -20,7 +20,7 @@ const TemperatureToggle: React.FC<TemperatureToggleProps> = ({ temperatureFormat
         />
       </label>
       <label className={styles.label +  " text-white"}>
-        Fahrenheit
+        Imperial
         <input
             className={styles.radioInput}
           type="radio"
