@@ -115,8 +115,8 @@ if (tempC != null && form != null) {
             <div>
               <TemperatureToggle temperatureFormat={temperatureFormat} onToggle={handleToggle} />
             </div>
-          <div className="animate__animated animate__fadeIn animate__fast">
-            <CardHeader>
+            
+            <CardHeader className="animate__animated animate__fadeIn">
               <div className="flex flex-col items-center">
                 <CardTitle className="text-white text-4xl"> {titleCase(data.name)} </CardTitle>
                 <div className="text-white text-center translate-y-1">
@@ -165,7 +165,6 @@ if (tempC != null && form != null) {
                 </div>
               </CardFooter>
             </div>
-          </div>
           </Card>
         </div>
       </div>

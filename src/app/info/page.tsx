@@ -80,71 +80,70 @@ export default function Info() {
 
     return (
         <main>
-          <div>
-            <Search onSearch={handleSearch} />
-          </div>
-          <div>
-          <Card className={`flex flex-col justify-between bg-gradient-to-b ${format.bgcolor}`}>
-            <div className='grid grid-rows-2 gap-4'>
-              <div className='text-white translate-y-2'>
-                <Link href={{pathname:'/', query: dataToSend}} className='className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
-                  Back Home
-                </Link>
-              </div>
-              <div>
-              <TemperatureToggle temperatureFormat={temp} onToggle={handleToggle} />
-              </div>
+          
+            <div>
+              <Search onSearch={handleSearch} />
             </div>
-            
-            <div className='flex flex-row gap-20'>
-              <div>
-                <CardHeader>
-                  <div className="flex flex-col">
-                    <CardTitle className="text-white text-6xl"> {titleCase(data.name)} </CardTitle>
-                    <CardDescription className="text-white "> {new Date(getTime(data.timezone)).toLocaleDateString("en-US", {weekday: 'long',year: 'numeric', month: 'long', day: 'numeric'})} </CardDescription>  
-                    <p>{new Date(getTime(data.timezone)).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</p> 
-                    <img src={format.img} alt="Sun" className="w-48 h-48" />
+            <div>
+              <Card className={`flex flex-col justify-between bg-gradient-to-b ${format.bgcolor}`}>
+                <div className='grid grid-rows-2 gap-4'>
+                  <div className='text-white translate-y-2'>
+                    <Link href={{pathname:'/', query: dataToSend}} className='className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
+                      Back Home
+                    </Link>
                   </div>
-                </CardHeader>
-              </div>
-            <CardContent>
-              <div className="flex flex-col translate-y-10 bg-black bg-opacity-15 p-8 rounded-lg">
-                <p className="text-7xl"> {Math.round(data.main.temp)}° </p>
-                <CardDescription className="text-white text-xl"> {titleCase(data.weather[0].description)} </CardDescription>
-                <p className="text-xl"> Feels Like: {Math.round(data.main.feels_like)}°</p>
-                <p className="text-xl"> Max - {Math.round(data.main.temp_max)}° | Min - {Math.round(data.main.temp_min)}°</p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <div className='grid grid-rows-5 gap-4 text-xl'>
-                <div className='grid grid-cols-2 gap-10'>
-                  <p>Humidity:</p>
-                  <p>{data.main.humidity} %</p>
+                  <div>
+                  <TemperatureToggle temperatureFormat={temp} onToggle={handleToggle} />
+                  </div>
                 </div>
-                <div className='grid grid-cols-2 gap-10'>
-                  <p>Visibility:</p>
-                  <p>{data.visibility/1000} km</p>
+                <div className="animate__animated animate__fadeIn animate__fast">
+                  <div className='flex flex-row gap-20'>
+                    <div>
+                      <CardHeader>
+                        <div className="flex flex-col">
+                          <CardTitle className="text-white text-6xl"> {titleCase(data.name)} </CardTitle>
+                          <CardDescription className="text-white "> {new Date(getTime(data.timezone)).toLocaleDateString("en-US", {weekday: 'long',year: 'numeric', month: 'long', day: 'numeric'})} </CardDescription>  
+                          <p>{new Date(getTime(data.timezone)).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</p> 
+                          <img src={format.img} alt="Sun" className="w-48 h-48" />
+                        </div>
+                      </CardHeader>
+                    </div>
+                  <CardContent>
+                    <div className="flex flex-col translate-y-10 bg-black bg-opacity-15 p-8 rounded-lg">
+                      <p className="text-7xl"> {Math.round(data.main.temp)}° </p>
+                      <CardDescription className="text-white text-xl"> {titleCase(data.weather[0].description)} </CardDescription>
+                      <p className="text-xl"> Feels Like: {Math.round(data.main.feels_like)}°</p>
+                      <p className="text-xl"> Max - {Math.round(data.main.temp_max)}° | Min - {Math.round(data.main.temp_min)}°</p>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <div className='grid grid-rows-5 gap-4 text-xl'>
+                        <div className='grid grid-cols-2 gap-10'>
+                          <p>Humidity:</p>
+                          <p>{data.main.humidity} %</p>
+                        </div>
+                        <div className='grid grid-cols-2 gap-10'>
+                          <p>Visibility:</p>
+                          <p>{data.visibility/1000} km</p>
+                        </div>
+                        <div className='grid grid-cols-2 gap-10'>
+                          <p>Wind:</p>
+                          <p>{data.wind.speed}{getUnit(temp)} {getCardinalDirection(data.wind.deg)}</p>
+                        </div>
+                        <div className='grid grid-cols-2 gap-10'>
+                          <p>Sunrise:</p>
+                          <p>{new Date(getSunrise(data.timezone, data.sys.sunrise)).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</p>
+                        </div>
+                        <div className='grid grid-cols-2 gap-10'>
+                          <p>Sunset:</p>
+                          <p>{new Date(getSunrise(data.timezone, data.sys.sunset)).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</p>
+                        </div>
+                      </div>
+                    </CardFooter>
+                  </div>
                 </div>
-                <div className='grid grid-cols-2 gap-10'>
-                  <p>Wind:</p>
-                  <p>{data.wind.speed}{getUnit(temp)} {getCardinalDirection(data.wind.deg)}</p>
-                </div>
-                <div className='grid grid-cols-2 gap-10'>
-                  <p>Sunrise:</p>
-                  <p>{new Date(getSunrise(data.timezone, data.sys.sunrise)).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</p>
-                </div>
-                <div className='grid grid-cols-2 gap-10'>
-                  <p>Sunset:</p>
-                  <p>{new Date(getSunrise(data.timezone, data.sys.sunset)).toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'})}</p>
-                </div>
-
-
-
-              </div>
-            </CardFooter>
-          </div>
-        </Card>
-          </div>
+              </Card>
+            </div>
         </main>
         
     
